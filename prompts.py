@@ -1,0 +1,2 @@
+not_birthday = """Today is not my birthday. Please can you write for me a sad haiku about it not being my birthday?"""
+birthday = """Today is my birthday! Please can you write for me an excited, happy haiku about my birthday?"""
