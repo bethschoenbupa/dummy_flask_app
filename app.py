@@ -21,7 +21,7 @@ def is_birthday(birthday):
   tg = TextGenerationGCP()
   today = datetime.today()
 
-  if today.date() == birthday_datetime.date():
+  if (today.month() == birthday_datetime.month()) & (today.day() == birthday_datetime.day()):
     birthday_prompt = p.birthday
     birthday_haiku = tg.generate_text(contents=birthday_prompt)
 
