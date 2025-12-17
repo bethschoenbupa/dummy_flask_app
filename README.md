@@ -1,0 +1,2 @@
+- i've cut corners
+- i've copied things from the actual flask app

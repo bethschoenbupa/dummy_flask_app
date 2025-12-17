@@ -18,10 +18,29 @@ class ErrorDetail(BaseModel):
 class ErrorMessages:
 
     class App:
+        MISSING_INFO = ErrorDetail(
+            msg="Invalid input",
+            error="Information is missing from the body of your request. Please refer to the API documentation.",
+            code=1001,
+            http_code=422
+        )
+        INCORRECT_VALUE = ErrorDetail(
+            msg="One or more of your request elements are invalid",
+            # error should be created by pydantic model
+            error="",
+            code=1002,
+            http_code=422
+        )
         DATE_CONVERSION = ErrorDetail(
             msg="Date format invalid",
             error="Unable to convert date input. Make sure it's a string in the format '%Y-%m-%d'",
-            code=1001
+            code=1003
+        )
+        
+        UNEXPECTED_ERROR = ErrorDetail(
+            msg="Something went wrong when trying to parse the request body",
+            error="",
+            code=1099
         )
 
 # if an Exception was raised, use this function to format it into a dictionary

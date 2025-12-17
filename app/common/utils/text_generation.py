@@ -1,41 +1,47 @@
-from google import genai
-from google.genai import types
-import json
+from openai import AzureOpenAI
+import os
 from dotenv import load_dotenv
+load_dotenv()
 
-load_dotenv(".env.public")
+class TextGeneration:
+    """
+    Text generation using Azure OpenAI's 4o-mini model.
+    ----------
+    Parameters
+    model : str
+        The model to use for text generation. Default is "4o-mini".
+    """
 
-class TextGenerationGCP:
+    def __init__(self, model: str="4o-mini"):
+        self.model = model        
+        self.client_4o = AzureOpenAI(
+            api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+            api_version="2025-01-01-preview",
+            azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT_4O")
+        )
 
-    def __init__(self, model_name: str = "gemini-2.5-flash", api_version: str = "v1"):
-        self.model_name = model_name
-        self.api_version = api_version
-        # stable API is v1, necessary connection info is in env vile
-        self.client = genai.Client(http_options=types.HttpOptions(api_version=self.api_version))
+    def generate_text(self, messages: list) -> dict:
+        """
+        Generate text based on the provided messages.
+        ----------
+        Parameters
+        messages : list
+            A list of message dictionaries to send to the model.
 
-    def generate_text(self, contents: str, system_instruction: str=None, response_schema: dict=None):
-        try:
-            config = types.GenerateContentConfig()
-            if system_instruction:
-                config.system_instruction = system_instruction
-            if response_schema:
-                config.response_schema = response_schema
-                config.response_mime_type = "application/json"
-
-            response = self.client.models.generate_content(
-                model=self.model_name,
-                config=config if system_instruction or response_schema else None,
-                contents=contents
-            )
-
-            if response_schema:
-                generated_content = json.loads(response.candidates[0].content.parts[0].text)
-            else:
-                generated_content = response.text
-
-            return generated_content
+        Returns
+        -------
+        dict
+            A dictionary containing the generated text and token usage.
         
-        except Exception as e:
-            error = "Something went wrong when trying to generate text: "
-            print(error)
-            raise e
+        Raises
+        -------
+        APILogicError
+            If there is an error during text generation.
+        """
+        response = self.client_4o.chat.completions.create(
+            model=self.model,
+            messages=messages
+        )
+        generated_text = response.choices[0].message.content
+
+        return generated_text
