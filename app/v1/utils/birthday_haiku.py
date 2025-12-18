@@ -20,6 +20,12 @@ def is_birthday(birthday: datetime):
             birthday_datetime = datetime.strptime(birthday, "%Y-%m-%d")
         except:
             raise Exception("Not correct date format")
+        
+    elif isinstance(birthday, datetime):
+        birthday_datetime = birthday
+
+    else:
+        raise Exception("Inputted birthday is not recognised.")
 
     today = datetime.today()
 

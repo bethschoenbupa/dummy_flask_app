@@ -99,9 +99,7 @@ def handle_error(
     response_body = _build_error_response_body(error_data)
 
     # 3. Serialize the response object into bytes and dispatch
-    _dispatch_response(response_body, validated_error_details.http_code)
-
-    return
+    return _dispatch_response(response_body, validated_error_details.http_code)
     
 
 def register_error_handlers(app):

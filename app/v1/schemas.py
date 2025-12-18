@@ -8,9 +8,9 @@
 from pydantic import (    
     BaseModel,
     field_validator,
-    field_serializer,
     Field,
-    ConfigDict
+    ConfigDict,
+    ValidationError
 )
 from typing import Optional, TypeVar, Generic
 from datetime import datetime 
@@ -88,18 +88,24 @@ class NameRequestModel(BaseModel):
     name: str
 
 class DateRequestModel(BaseModel):
-    date: str
+    date: datetime
         
     @field_validator("date", mode="before")
     @classmethod
     def ensure_date_structure(cls, date):
-        try:
-            date_obj = datetime.strptime(date, "%Y-%m-%d")
-        except Exception as e:
-            error_details = format_error(ErrorMessages.App.DATE_CONVERSION, exception=e)
-            raise APILogicError(error_details)
+        if isinstance(date, str):
+            try:
+                date_obj = datetime.strptime(date, "%Y-%m-%d")
+                return date_obj
+            except Exception as e:
+                error_details = format_error(ErrorMessages.App.DATE_CONVERSION, exception=e)
+                raise APILogicError(error_details)
+        elif isinstance(date, datetime):
+            return date
+        else:
+            raise ValidationError("Datetime not recognised")
             
-        return date_obj
+        
     
 # ============================= #
 # --- Haiku endpoint models --- #

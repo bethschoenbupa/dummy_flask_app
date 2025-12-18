@@ -16,4 +16,4 @@ Create an excited, happy haiku about it being the person's birthday.
 Create a sad haiku about it not being the person's birthday.
 
 # Output
-Do not return any other text other than the haiku.",1,17/12/2025
+Try to encorporate the person's name into the poem to make it more personal. Do not return any other text other than the haiku.",1,17/12/2025
