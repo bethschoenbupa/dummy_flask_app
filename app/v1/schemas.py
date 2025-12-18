@@ -8,6 +8,7 @@
 from pydantic import (    
     BaseModel,
     field_validator,
+    field_serializer,
     Field,
     ConfigDict,
     ValidationError
@@ -132,23 +133,4 @@ HaikuServiceResult = ServiceResult[HaikuResponseModel]
 # --- Next Year endpoint models --- #
 # ================================= #
 
-# class NextYearRequestModel(DateRequestModel):
-#     pass
-
-# class NextYearResponseModel(BaseModel):
-#     next_year_date: str = Field(
-#         ...,
-#         alias="nextYearDate",
-#         description="The requesters birthday next year"
-#     )
-
-#     @field_serializer("next_year_date", mode="wrap")
-#     @classmethod
-#     def format_next_year_date(cls, date):
-#         date_obj = datetime.strptime(date, "%Y-%m-%d")
-#         return date_obj.strftime("%Y-%m-%d")
-    
-#     model_config = ConfigDict(
-#         populate_by_name=True,
-#     )
-
+# Paste notebook code here

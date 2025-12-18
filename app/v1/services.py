@@ -41,3 +41,9 @@ def haiku_service(request: HaikuRequestModel) -> HaikuServiceResult:
     )
 
     return response
+
+# ================================= #
+#      --- Next Year Service ---    #
+# ================================= #
+
+# Paste notebook code here

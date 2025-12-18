@@ -28,3 +28,10 @@ def birthday_haiku(validated_input: HaikuRequestModel):
     API Endpoint for generating a birthday haiku.
     """
     return haiku_service(validated_input)
+
+
+# ================================= #
+#       --- Next Year Route ---     #
+# ================================= #
+
+# Paste notebook code here
