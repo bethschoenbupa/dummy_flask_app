@@ -1,4 +1,13 @@
 from pydantic import BaseModel, Field, ConfigDict
+from typing import Generic, TypeVar, Dict
+from enum import Enum
+
+DataType = TypeVar('DataType')
+
+class RouteData(BaseModel, Generic[DataType]):
+    createdAt: str
+    timezone: str
+    generatedContent: DataType
 
 class ErrorData(BaseModel):
     code: int
@@ -13,3 +22,16 @@ class ErrorData(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,
     )
+
+class Metadata(BaseModel):
+    model: str #Dict[str, str]
+    prompts: Dict[str, float]
+    tokens: Dict[str, float]
+
+class LLMProvider(str, Enum):
+  vertex = "vertex"
+  azure = "azure"
+
+class AIRequestContext(BaseModel):
+  provider: LLMProvider = LLMProvider.vertex.value
+  shadow_mode: bool = False

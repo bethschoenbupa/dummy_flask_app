@@ -13,45 +13,59 @@ from pydantic import (
     ConfigDict,
     ValidationError
 )
-from typing import Optional, TypeVar, Generic
+from typing import Optional, TypeVar, Generic, Dict
 from datetime import datetime 
-import uuid
-
+from enum import Enum
 from app.common.exceptions import ErrorMessages, format_error, APILogicError
 from app.common.schemas import ErrorData
 
-# ====================== #
-# --- Generic models --- #
-# ====================== #
+# =========================== #
+# --- API Response models --- #
+# =========================== #
 
-DataType = TypeVar('DataType')
-
-# allows all services to return a consistent structure
-class ServiceResult(BaseModel, Generic[DataType]):
-    data: DataType
+class Status(str, Enum):
+    Success = "SUCCESS"
+    Failed = "FAILED"
 
 class InferenceMetadata(BaseModel):
     """
-    Information about the request that was completed
+    Pydantic model for InferenceMetadata, based on the Avro schema and
+    extended with creation timestamp information.
     """
     
+    # --- Fields from Avro Schema ---
     request_id: str = Field(
         alias="requestId",
         description="Request ID, typically the traceId from the request."
     )
     
-    route: str = Field(
-        description="The endpoint that has been called"
-    )
-
     api_version: str = Field(
         alias="apiVersion",
-        description="The api version"
+        description="AI inference API version."
     )
     
-    status: str = Field(
+    status: Status = Field(
         description="The status of the API response (e.g., 'success')."
     )
+    
+    model: Optional[str] = Field(
+        description="Identifier for the inference model that was used.",
+        default=None
+    )
+    
+    prompts: Optional[Dict[str, int]] = Field(
+        description="A map of prompt names to their versions.",
+        default=None
+    )
+    
+    tokens: Optional[int] = Field(
+        description="Total token count used for the inference.",
+        default=None
+    )
+    
+    @field_serializer("status")
+    def serialize_status(self, status: Status, _info):
+        return status.value
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -105,8 +119,30 @@ class DateRequestModel(BaseModel):
             return date
         else:
             raise ValidationError("Datetime not recognised")
-            
-        
+
+# ========================================= #
+# --- Reusable service response models ---  #
+# ========================================= #
+
+class Metadata(BaseModel):
+    model: str #Dict[str, str]
+    prompts: Dict[str, float]
+    tokens: Dict[str, float]
+
+DataType = TypeVar('DataType')
+
+class ServiceResult(BaseModel, Generic[DataType]):
+    data: DataType
+    metadata: Metadata
+    partial_result: Optional[bool] = Field(
+        default=False,
+        alias="partialResult",
+        description="Indicates if the result is partial due to an error or timeout."
+    )
+    
+    model_config = ConfigDict(
+        populate_by_name=True,
+    )
     
 # ============================= #
 # --- Haiku endpoint models --- #

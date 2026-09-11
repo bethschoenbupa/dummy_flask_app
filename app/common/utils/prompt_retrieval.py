@@ -7,8 +7,11 @@
 ##########################
 
 import pandas as pd
+import os
 from typing import Union
 from flask import current_app
+
+import variables as vr
 
 def access_prompt_data() -> pd.DataFrame:
     """
@@ -25,7 +28,7 @@ def access_prompt_data() -> pd.DataFrame:
     # - check the columns are as expected
     # - read the data from cloud storage
     # - save the file path as a variable
-    df = pd.read_csv('data/birthday_prompts.csv')
+    df = pd.read_csv(os.path.join(vr.project_dir, 'data/birthday_prompts.csv'))
     
     return df
 
@@ -53,7 +56,7 @@ def get_prompt(prompt_name: str, version: Union[str, float] = "latest") -> str:
             raise Exception("Prompt data not in app context.")
     except:
         print("WARNING: Prompt data is not available in the app context. Therefore, loading local prompt data before completing task - this can slow down runtime.")
-        df = access_prompt_data(use_cloud_prompts=False)
+        df = access_prompt_data()
 
     # filter for prompt name
     # (Exceptions have been simplified for demo purposes)

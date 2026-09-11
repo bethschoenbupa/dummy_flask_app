@@ -10,7 +10,7 @@ from typing import Union
 from app.common.schemas import ErrorData
 from app.common.exceptions import ErrorMessages, APILogicError, format_error, ErrorDetail
 from pydantic import ValidationError
-from app.v1.schemas import InferenceMetadata, ApiResponse
+from app.v1.schemas import Status, InferenceMetadata, ApiResponse
 
 def _build_error_response_body(
     error_data: ErrorData
@@ -32,7 +32,7 @@ def _build_error_response_body(
         request_id=g.request_id,
         route=request.path,
         api_version=g.api_version,
-        status="ERROR"
+        status=Status.Failed.value
     )
     
     return ApiResponse(

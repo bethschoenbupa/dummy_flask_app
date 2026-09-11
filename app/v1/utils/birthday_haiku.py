@@ -1,6 +1,12 @@
 from datetime import datetime
+from typing import Callable
+import json
 
-from app.common.utils.text_generation import TextGeneration
+from app.common.clients.response_schemas import HaikuResponse, HAIKU_KEY
+from app.common.clients.text_generation import TextGenerator
+
+from app.common.exceptions import ErrorMessages, APILogicError, format_error
+import variables as vr
 
 def is_birthday(birthday: datetime):
     """
@@ -37,7 +43,8 @@ def is_birthday(birthday: datetime):
 def generate_birthday_haiku(
     name: str,
     is_birthday: bool,
-    prompt: str
+    prompt: str,
+    get_generator: Callable[[str], TextGenerator]
 ):
     """
     Generate a birthday haiku using an LLM.
@@ -69,7 +76,32 @@ def generate_birthday_haiku(
         {"role": "user", "content": str(user_info)}
     ]
 
-    tg = TextGeneration()
-    birthday_haiku = tg.generate_text(messages)
+    haiku_generator = get_generator(task=vr.haiku_prompt_name)
+    text_gen_result = haiku_generator.generate_text(
+        json.dumps(user_info), 
+        system_instruction=prompt, 
+        response_model=HaikuResponse,
+        task_str=vr.haiku_task_str
+    )
 
-    return birthday_haiku
+    if vr.generated_content_key not in text_gen_result or vr.token_key not in text_gen_result:
+        error_details = format_error(ErrorMessages.TextGeneration.INCORRECT_RESPONSE_FORMAT)
+        raise APILogicError(error_details)
+
+    haiku = text_gen_result[vr.generated_content_key][HAIKU_KEY]
+    tokens = text_gen_result[vr.token_key]
+
+    try:
+        result = {
+            HAIKU_KEY:haiku,
+            vr.token_key:tokens,
+            vr.models_key: {
+                vr.haiku_prompt_name: haiku_generator.model_name
+            }
+        }
+    # result doesn't have expected keys - response format has not been conformed to
+    except Exception as e:
+        error_details = format_error(ErrorMessages.BirthdayHaiku.INCORRECT_RESPONSE_FORMAT, e)
+        raise APILogicError(error_details)
+
+    return result
