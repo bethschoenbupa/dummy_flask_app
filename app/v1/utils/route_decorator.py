@@ -15,7 +15,7 @@ from pydantic import BaseModel, ValidationError
 
 from app.common.schemas import AIRequestContext
 from app.common.clients.text_generator_factory import TextGeneratorFactory
-from app.v1.schemas import InferenceMetadata, ApiResponse
+from app.v1.schemas import InferenceMetadata, ApiResponse, Status
 from app.v1.model_versions import MODEL_MAP
 
 from app.common.exceptions import (
@@ -196,7 +196,7 @@ def build_api_response(
     inference_metadata = InferenceMetadata(
         request_id=g.request_id,
         api_version=g.api_version,
-        status=vr.success_status,
+        status=Status.Success,
         model=service_metadata.model,
         prompts=service_metadata.prompts,
         tokens=total_tokens

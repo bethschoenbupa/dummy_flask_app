@@ -26,7 +26,7 @@ from requests.exceptions import Timeout, ConnectionError
 from log import logger
 import variables as vr
 from app.common.exceptions import validate_internal_call
-from app.common.schemas import RouteData, ErrorData, Metadata
+from app.common.schemas import RouteData, ErrorData, Metadata, Status
 
 def log_retry(retry_state: RetryCallState):
     logger.warning(
@@ -152,7 +152,7 @@ class RequestLogger:
             "data":response_body
         }
         self._log_event[vr.response_key] = data_to_log
-        self._log_event["status"] = vr.success_status
+        self._log_event["status"] = Status.Success
     
     @validate_internal_call
     def log_error_data(self, error_body: ErrorData):
@@ -165,7 +165,7 @@ class RequestLogger:
             "data":error_body_dict
         }
         self._log_event[vr.error_key] = data_to_log
-        self._log_event["status"] = vr.error_status
+        self._log_event["status"] = Status.Failed
 
     @validate_internal_call
     def log_response_metadata(self, metadata: Metadata):
@@ -219,7 +219,7 @@ class NullRequestLogger:
             "data":response_body
         }
         self._log_event[vr.response_key] = data_to_log
-        self._log_event["status"] = vr.success_status
+        self._log_event["status"] = Status.Success
     
     def log_error_data(self, error_body: ErrorData):
 
@@ -230,7 +230,7 @@ class NullRequestLogger:
             "data":error_body
         }
         self._log_event[vr.error_key] = data_to_log
-        self._log_event["status"] = vr.error_status
+        self._log_event["status"] = Status.Failed
 
     def log_response_metadata(self, metadata: Metadata):
 

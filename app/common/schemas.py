@@ -2,6 +2,10 @@ from pydantic import BaseModel, Field, ConfigDict
 from typing import Generic, TypeVar, Dict
 from enum import Enum
 
+class Status(str, Enum):
+    Success = "SUCCESS"
+    Failed = "FAILED"
+
 DataType = TypeVar('DataType')
 
 class RouteData(BaseModel, Generic[DataType]):

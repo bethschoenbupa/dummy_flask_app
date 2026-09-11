@@ -17,7 +17,7 @@ from typing import Optional, TypeVar, Generic, Dict
 from datetime import datetime 
 from enum import Enum
 from app.common.exceptions import ErrorMessages, format_error, APILogicError
-from app.common.schemas import ErrorData
+from app.common.schemas import ErrorData, Metadata
 
 # =========================== #
 # --- API Response models --- #
@@ -123,11 +123,6 @@ class DateRequestModel(BaseModel):
 # ========================================= #
 # --- Reusable service response models ---  #
 # ========================================= #
-
-class Metadata(BaseModel):
-    model: str #Dict[str, str]
-    prompts: Dict[str, float]
-    tokens: Dict[str, float]
 
 DataType = TypeVar('DataType')
 

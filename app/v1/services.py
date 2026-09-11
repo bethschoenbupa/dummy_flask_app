@@ -10,7 +10,8 @@ from app.v1.utils.birthday_haiku import is_birthday, generate_birthday_haiku
 import app.v1.prompt_versions as pv
 from app.common.utils.prompt_retrieval import get_prompt
 # request and response models for all services
-from app.v1.schemas import HaikuRequestModel, HaikuResponseModel, HaikuServiceResult, Metadata
+from app.v1.schemas import HaikuRequestModel, HaikuResponseModel, HaikuServiceResult
+from app.common.schemas import Metadata
 import app.common.clients.response_schemas as rs
 
 from app.common.clients.text_generation import TextGenerator
