@@ -2,7 +2,7 @@ from flask import Flask, request, g
 import uuid
 
 from config import config_by_name
-from extensions import cache
+from app.extensions import cache
 
 from app.common.utils.error_handling import register_error_handlers
 from app.common.utils.prompt_retrieval import access_prompt_data

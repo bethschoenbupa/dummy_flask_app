@@ -8,8 +8,8 @@
 from flask import Blueprint
 import os
 from app.v1.utils.caching_decorator import api_cached
-import app.v1.utils.prompt_versions as pv
-import app.v1.utils.model_versions as mv
+import app.v1.prompt_versions as pv
+import app.v1.model_versions as mv
 from typing import Callable
 
 from app.v1.schemas import HaikuRequestModel, HaikuServiceResult
