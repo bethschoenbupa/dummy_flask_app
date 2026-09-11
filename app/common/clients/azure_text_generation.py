@@ -1,7 +1,7 @@
 import os
 import json
 from dotenv import load_dotenv
-from openai import AzureOpenAI
+#from openai import AzureOpenAI
 from tenacity import retry, stop_after_attempt, wait_exponential_jitter, RetryCallState
 from typing import Optional, Type
 from pydantic import BaseModel
