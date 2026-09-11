@@ -309,7 +309,7 @@ def api_cached(
             
             # if we're using redis, can use redis locks to prevent multiple processes from doing the same work while we compute and set the cache. 
             # If we're using simple cache (in-memory, for testing), we skip locking as it's not needed.
-            if current_app.config.get('CACHE_TYPE', "simple") == "simple":
+            if current_app.config.get('CACHE_TYPE', "SimpleCache") == "SimpleCache":
                 logger.info("CACHE MISS")
 
                 cache_summary.phase = CachePhase.SIMPLE
