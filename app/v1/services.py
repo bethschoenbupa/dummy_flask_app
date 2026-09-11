@@ -38,14 +38,14 @@ def haiku_service(
             prompt_map[prompt] = pv.HAIKU_PROMPT_MAP[prompt]
     
     # 1. Check if today is the user's birthday
-    birthday_today = is_birthday(validated_data.date)
+    birthday_today = is_birthday(validated_data.user_info.date)
     
     # 2. Get the haiku-writing prompt
     prompt = get_prompt(prompt_name=vr.haiku_prompt_name, version=prompt_map[vr.haiku_prompt_name])
 
     # 3. Use an LLM to write the prompt
     result = generate_birthday_haiku(
-        name=validated_data.name,
+        name=validated_data.user_info.name,
         is_birthday=birthday_today,
         prompt=prompt,
         get_generator=get_generator
