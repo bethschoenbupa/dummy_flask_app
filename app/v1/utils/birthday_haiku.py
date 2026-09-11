@@ -71,11 +71,6 @@ def generate_birthday_haiku(
         "is_birthday": is_birthday
     }
 
-    messages = [
-        {"role": "system", "content": prompt},
-        {"role": "user", "content": str(user_info)}
-    ]
-
     haiku_generator = get_generator(task=vr.haiku_prompt_name)
     text_gen_result = haiku_generator.generate_text(
         json.dumps(user_info), 

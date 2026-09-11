@@ -1,6 +1,20 @@
 from pydantic import BaseModel, Field, ConfigDict
 from typing import Generic, TypeVar, Dict
 from enum import Enum
+from typing import Optional
+
+class CacheOutcome(str, Enum):
+    HIT = "hit"
+    MISS = "miss"
+    BYPASS = "bypass" # cache not used, regardless of circumstances (e.g., shadow mode, non-target provider, config disabled, etc.)
+
+class CacheMetadata(BaseModel):
+    outcome: CacheOutcome = CacheOutcome.BYPASS
+    original_request_id: Optional[str] = None
+    cache_key: Optional[str] = None
+    phase: Optional[str] = None
+    bypass_reason: Optional[str] = None
+    wait_ms: Optional[float] = None
 
 class Status(str, Enum):
     Success = "SUCCESS"
@@ -30,7 +44,8 @@ class ErrorData(BaseModel):
 class Metadata(BaseModel):
     model: str #Dict[str, str]
     prompts: Dict[str, float]
-    tokens: Dict[str, float]
+    tokens: Dict[str, float]    
+    cache_metadata: Optional[CacheMetadata] = None
 
 class LLMProvider(str, Enum):
   vertex = "vertex"

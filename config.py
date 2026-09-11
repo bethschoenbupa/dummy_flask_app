@@ -26,7 +26,7 @@ class Config:
     
     # Caching
     ENABLE_CACHING = True
-    CACHE_TYPE = "simple"
+    CACHE_TYPE = "SimpleCache"
     # measured in seconds - default is a day
     CACHE_DEFAULT_TIMEOUT = 24 * 60 * 60   
     
@@ -38,7 +38,7 @@ class ProductionConfig(Config):
     CLOUD_SAVE_LOGGING = os.environ.get("CLOUD_SAVE_LOGGING", "true").lower() in ('true', '1')
 
     ENABLE_CACHING = True
-    CACHE_TYPE = os.environ.get("CACHE_TYPE", "simple")
+    CACHE_TYPE = os.environ.get("CACHE_TYPE", "SimpleCache")
     CACHE_DEFAULT_TIMEOUT = int(os.environ.get("CACHE_DEFAULT_TIMEOUT", 24 * 60 * 60))
 
 class DevelopmentConfig(Config):

@@ -143,8 +143,15 @@ class ServiceResult(BaseModel, Generic[DataType]):
 # --- Haiku endpoint models --- #
 # ============================= #
 
-class HaikuRequestModel(NameRequestModel, DateRequestModel):
+class UserInfoModel(NameRequestModel, DateRequestModel):
     pass
+
+class HaikuRequestModel(BaseModel):
+    user_info: UserInfoModel = Field(
+        ...,
+        alias="userInfo",
+        description="Information about the user making the request."
+    )
 
 class HaikuResponseModel(BaseModel):
     is_birthday: bool = Field(

@@ -1,7 +1,7 @@
 import os
 import json
 from dotenv import load_dotenv
-#from openai import AzureOpenAI
+from openai import AzureOpenAI
 from tenacity import retry, stop_after_attempt, wait_exponential_jitter, RetryCallState
 from typing import Optional, Type
 from pydantic import BaseModel
@@ -38,8 +38,14 @@ class AzureTextGenerator(TextGenerator):
             model_name (str): The deployment name of the model in Azure.
             api_version (str): The API version to use (default is "2025-01-01-preview").
         """
-        self.model_name = model_name
-        self.api_version = api_version
+        #self.model_name = model_name
+        #self.api_version = api_version
+        self.model = model_name
+        self.client_4o = AzureOpenAI(
+            api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+            api_version="2025-01-01-preview", # api_version
+            azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT_4O")
+        )
         # try:
         #     # dynamically construct environment variable name for the endpoint based on the model name
         #     endpoint_env_var = f"AZURE_OPENAI_ENDPOINT_{model_name.upper().replace('-', '_').replace('.', '_')}"
@@ -110,13 +116,24 @@ class AzureTextGenerator(TextGenerator):
         contents: str,
         system_instruction: str = None,
         response_model: Optional[Type[BaseModel]] = None,
-        task_str: str = None
+        task_str: Optional[str] = None
     ) -> dict:
         """
         Makes a request to the Azure OpenAI model using the Responses API.
         Supports both structured (Pydantic) and unstructured outputs.
         """
-        pass
+        messages = [
+            {"role": "system", "content": system_instruction},
+            {"role": "user", "content": json.dumps(contents)}
+        ]
+        response = self.client_4o.chat.completions.create(
+            model=self.model,
+            messages=messages
+        )
+        generated_text = response.choices[0].message.content
+
+        return generated_text
+        # The below isn't working and would be used to also validate with Pydantic
         # try:
         #     input_payload = []
 

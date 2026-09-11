@@ -6,6 +6,10 @@
 #############################
 
 from flask import Blueprint
+import os
+from app.v1.utils.caching_decorator import api_cached
+import app.v1.utils.prompt_versions as pv
+import app.v1.utils.model_versions as mv
 from typing import Callable
 
 from app.v1.schemas import HaikuRequestModel, HaikuServiceResult
@@ -24,6 +28,13 @@ v1_bp.api_version = api_version
 @api_route(
     json_request_model=HaikuRequestModel, 
     service_result_model=HaikuServiceResult,
+)
+@api_cached(
+    timeout=os.environ.get('CACHE_DEFAULT_TIMEOUT', 24 * 60 * 60),  # default cache timeout of 24 hours, can be overridden by env var
+    route_name="birthdayhaiku",
+    field_name='user_info',
+    prompt_versions=pv.BIRTHDAY_HAIKU_PROMPT_VERSION_STRING,
+    models_used=mv.BIRTHDAY_HAIKU_MODEL_STRING
 )
 def birthday_haiku(validated_input: HaikuRequestModel, get_generator: Callable[[str], TextGenerator]):
     """

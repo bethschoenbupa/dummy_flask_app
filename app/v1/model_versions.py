@@ -24,3 +24,5 @@ def create_model_string_for_route(prompts: set) -> str:
     for key, val in filtered_model_map.items():
         s += f"{key}:{val}_"
     return s.strip("_")
+
+BIRTHDAY_HAIKU_MODEL_STRING = create_model_string_for_route({vr.haiku_prompt_name})

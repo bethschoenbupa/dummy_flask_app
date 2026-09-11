@@ -2,12 +2,15 @@ from flask import Flask, request, g
 import uuid
 
 from config import config_by_name
+from extensions import cache
 
 from app.common.utils.error_handling import register_error_handlers
 from app.common.utils.prompt_retrieval import access_prompt_data
 from app.common.utils.request_logging import RequestLogger, NullRequestLogger
 
 from app.v1.routes import v1_bp
+
+from log import logger
 
 def create_app(config_name="default"):
     """
@@ -22,6 +25,15 @@ def create_app(config_name="default"):
 
     app = Flask(__name__)
     app.config.from_object(config_by_name[config_name])
+
+    # 0. Setup caching
+    if app.config["ENABLE_CACHING"]:
+        try:
+            cache.init_app(app)
+            logger.info(f"Caching enabled: {app.config['CACHE_TYPE']}")
+        except Exception as e:
+            logger.warning(f"CACHING ISSUE: failed to initialise cache: {e}")
+
 
     # 1. Load prompt data
     # no try except here - if we can't access prompt data, there is a critical issue and the app shouldn't start
