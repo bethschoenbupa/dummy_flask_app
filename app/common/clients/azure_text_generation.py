@@ -1,7 +1,7 @@
 import os
 import json
 from dotenv import load_dotenv
-from openai import AzureOpenAI
+#from openai import AzureOpenAI
 from tenacity import retry, stop_after_attempt, wait_exponential_jitter, RetryCallState
 from typing import Optional, Type
 from pydantic import BaseModel
@@ -40,26 +40,26 @@ class AzureTextGenerator(TextGenerator):
         """
         self.model_name = model_name
         self.api_version = api_version
-        try:
-            # dynamically construct environment variable name for the endpoint based on the model name
-            endpoint_env_var = f"AZURE_OPENAI_ENDPOINT_{model_name.upper().replace('-', '_').replace('.', '_')}"
-            azure_endpoint = os.getenv(endpoint_env_var)
+        # try:
+        #     # dynamically construct environment variable name for the endpoint based on the model name
+        #     endpoint_env_var = f"AZURE_OPENAI_ENDPOINT_{model_name.upper().replace('-', '_').replace('.', '_')}"
+        #     azure_endpoint = os.getenv(endpoint_env_var)
 
-            if not azure_endpoint:
-                raise ValueError(f"Environment variable {endpoint_env_var} not set.")
+        #     if not azure_endpoint:
+        #         raise ValueError(f"Environment variable {endpoint_env_var} not set.")
 
-            self.client = AzureOpenAI(
-                api_key=os.getenv("AZURE_OPENAI_API_KEY"),
-                api_version=self.api_version,
-                azure_endpoint=azure_endpoint,
-            )
-            # This is a quick test to ensure the credentials and endpoint are valid.
-            self.client.models.list()
-            logger.info(f"AzureOpenAI client initialized for model: {self.model_name}")
+        #     self.client = AzureOpenAI(
+        #         api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+        #         api_version=self.api_version,
+        #         azure_endpoint=azure_endpoint,
+        #     )
+        #     # This is a quick test to ensure the credentials and endpoint are valid.
+        #     self.client.models.list()
+        #     logger.info(f"AzureOpenAI client initialized for model: {self.model_name}")
 
-        except Exception as e:
-            error_details = format_error(ErrorMessages.TextGeneration.OPENAI_CONNECTION, e)
-            raise APILogicError(error_details)
+        # except Exception as e:
+        #     error_details = format_error(ErrorMessages.TextGeneration.OPENAI_CONNECTION, e)
+        #     raise APILogicError(error_details)
 
     def _get_token_count(self, usage_metadata, task_str: str = None) -> dict:
         """
@@ -116,53 +116,54 @@ class AzureTextGenerator(TextGenerator):
         Makes a request to the Azure OpenAI model using the Responses API.
         Supports both structured (Pydantic) and unstructured outputs.
         """
-        try:
-            input_payload = []
+        pass
+        # try:
+        #     input_payload = []
 
-            # System instruction (if provided)
-            if system_instruction:
-                input_payload.append({
-                    "role": "system",
-                    "content": system_instruction
-                })
+        #     # System instruction (if provided)
+        #     if system_instruction:
+        #         input_payload.append({
+        #             "role": "system",
+        #             "content": system_instruction
+        #         })
 
-            # User content
-            input_payload.append({
-                "role": "user",
-                "content": contents
-            })
+        #     # User content
+        #     input_payload.append({
+        #         "role": "user",
+        #         "content": contents
+        #     })
 
-            # STRUCTURED OUTPUT (Pydantic)
-            if response_model:
-                response = self.client.responses.parse(
-                    model=self.model_name,
-                    input=input_payload,
-                    response_format=response_model
-                )
+        #     # STRUCTURED OUTPUT (Pydantic)
+        #     if response_model:
+        #         response = self.client.responses.parse(
+        #             model=self.model_name,
+        #             input=input_payload,
+        #             response_format=response_model
+        #         )
 
-                generated_content = response.output_parsed.model_dump()
+        #         generated_content = response.output_parsed.model_dump()
 
-            # UNSTRUCTURED OUTPUT
-            else:
-                response = self.client.responses.create(
-                    model=self.model_name,
-                    input=input_payload
-                )
+        #     # UNSTRUCTURED OUTPUT
+        #     else:
+        #         response = self.client.responses.create(
+        #             model=self.model_name,
+        #             input=input_payload
+        #         )
 
-                generated_content = response.output_text
+        #         generated_content = response.output_text
 
-            logger.info("Content generated.")
+        #     logger.info("Content generated.")
 
-            token_usage = getattr(response, "usage", None)
-            token_count = self._get_token_count(token_usage, task_str)
+        #     token_usage = getattr(response, "usage", None)
+        #     token_count = self._get_token_count(token_usage, task_str)
 
-            return {
-                app_vr.generated_content_key: generated_content,
-                app_vr.token_key: token_count
-            }
+        #     return {
+        #         app_vr.generated_content_key: generated_content,
+        #         app_vr.token_key: token_count
+        #     }
 
-        except Exception as e:
-            error_details = format_error(
-                ErrorMessages.TextGeneration.TEXT_GENERATION, e
-            )
-            raise APILogicError(error_details)
+        # except Exception as e:
+        #     error_details = format_error(
+        #         ErrorMessages.TextGeneration.TEXT_GENERATION, e
+        #     )
+        #     raise APILogicError(error_details)
