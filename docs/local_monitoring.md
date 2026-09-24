@@ -121,7 +121,7 @@ The program will receive a request to evaluate a day of requests and will theref
 # Workflow
 A decoupled, event-driven architecture is a robust scalable solution for handling a varying number of evaluation requests.
 
-![Evaluation Workflow](Evaluation Workflow.png)
+![Evaluation Workflow](images/Evaluation Workflow.png)
 
 1. Trigger (Scheduler):
 
