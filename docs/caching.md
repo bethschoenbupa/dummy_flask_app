@@ -40,7 +40,7 @@ The workflow of the caching system has been visualised below. This outlines the 
 - **Libraries:** Add Flask-Caching and Redis to the project's dependencies.
 - **Authorisation:** Setup a code for instantiating a Redis client via common utilities. A custom class for using the database will be required so that we can use this authorisation method. 
 
-```
+```python
 # NEW FILE: app/common/redis_client.py
 import os
 import redis
@@ -126,7 +126,7 @@ def create_app(config_name="default"):
 
 - **Custom Cache Key:** As Sapient’s requests will include fields unique to each input (e.g. Connection ID), using Flask-Caching logic to recognise duplicate requests will result in Cache Misses every time. Instead, search through a request input for a specific field that will be compared to historic requests. A custom function to extract the necessary field will be programmed in a new utils file. This function will hash the observation text, prompt versions, models, and app version to create a unique and consistent cache key. 
 
-``
+```python
 # NEW FILE: app/v1/utils/caching_decorator.py
 from functools import wraps
 import hashlib
@@ -208,7 +208,7 @@ def _make_cache_key_from_pydantic(
 
 - **Caching Logic:** Flask-Caching's built-in @cache.cached decorator on the service function was considered, but it has a significant limitation: it makes tracking cache hits and misses within the application difficult, as the decorated function is bypassed entirely on a cache hit. This would prevent us from directly measuring the ROI of this project. Therefore, the recommended solution is to create a new, reusable @api_cached decorator. This decorator will be stacked with our existing @api_route decorator, allowing it to intercept requests, check the cache, and transparently add a cache_status field to the response metadata. This approach provides full control and observability while keeping our route and service logic clean.
 
-```
+```python
 # UPDATE FILE: app/v1/prompt_versions.py
 # create a string that includes all prompt versions
 NOTE_PREPROCESSING_PROMPT_VERSION_STRING = (
@@ -318,7 +318,7 @@ def api_cached(
 
 - **Route Implementation:** The decorators are stacked on the route function, resulting in a clean and declarative implementation. With the latest shadow traffic refactor, the caching decorator is theoretically called within execute_service_logic inapp/v1/utils/route_decorator.py. In the api_route decorator, we’ve extracted data from the request, validated the request, and called to execute the service. At this point, api_cacheddecorator is used to check the caching DB, call the service, and return the output back to execute_service_logic which will validate the service structure.
 
-```
+```python
 @v1_bp.route(f"/notepreprocessing", methods=["POST"])
 @api_route(
     http_request_model=NotePreprocessingRequestModel,
@@ -346,7 +346,7 @@ def preprocess(validated_input: NotePreprocessingEvent | NotePreprocessingReques
 
 This example can help with conceptually understanding the chaining of decorators:
 
-```
+```python
 from functools import wraps
 # Second decorator applied => it will receive a string that already has @s around it, and will add *s around that
 def star_decor(n_stars: int=None):
@@ -385,7 +385,7 @@ print(whisper_something("I REALLY hope this works"))
 
 Returns
 
-```
+```plaintext
 **********
 @@@@@@@@@@@@@
 HELLO, WORLD!
