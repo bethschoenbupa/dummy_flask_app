@@ -1,12 +1,18 @@
 from flask import Flask, request, g
 import uuid
 
+from config import config_by_name
+from app.extensions import cache
+
 from app.common.utils.error_handling import register_error_handlers
 from app.common.utils.prompt_retrieval import access_prompt_data
+from app.common.utils.request_logging import RequestLogger, NullRequestLogger
 
 from app.v1.routes import v1_bp
 
-def create_app():
+from log import logger
+
+def create_app(config_name="default"):
     """
     Setup Flask app
     1. Load prompt data
@@ -18,6 +24,16 @@ def create_app():
     """
 
     app = Flask(__name__)
+    app.config.from_object(config_by_name[config_name])
+
+    # 0. Setup caching
+    if app.config["ENABLE_CACHING"]:
+        try:
+            cache.init_app(app)
+            logger.info(f"Caching enabled: {app.config['CACHE_TYPE']}")
+        except Exception as e:
+            logger.warning(f"CACHING ISSUE: failed to initialise cache: {e}")
+
 
     # 1. Load prompt data
     # no try except here - if we can't access prompt data, there is a critical issue and the app shouldn't start
@@ -35,6 +51,15 @@ def create_app():
         if request.blueprint and request.blueprint in app.blueprints:
             blueprint_object = app.blueprints[request.blueprint]
             g.api_version = str(getattr(blueprint_object, 'api_version', g.api_version))
+
+        # Create and store the logger for this specific request on 'g'
+        LoggerClass = RequestLogger if app.config['ENABLE_REQUEST_LOGGING'] else NullRequestLogger
+        g.request_logger = LoggerClass(
+            path=request.path,
+            request_id=g.request_id,
+            api_version=g.api_version,
+            cloud_save=app.config['CLOUD_SAVE_LOGGING']
+        )
 
         print(f"ID {g.request_id}: ## New Request to v{g.api_version}. Path: {request.path}")
 
